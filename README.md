@@ -9,5 +9,4 @@ This package includes:
   Protobuf format.
 - `MarshallerTypedMUS` — an interface for types that support typed Protobuf
   serialization (designed for use with [DTS](https://github.com/mus-format/dts-go)).
-- Contains serializers for string, slice and timestamp types.
-
+- Serializers for string, slice and timestamp types.
