@@ -1,20 +1,21 @@
-package exts
+package ext
 
 import (
 	com "github.com/mus-format/common-go"
-	muss "github.com/mus-format/mus-stream-go"
+	"github.com/mus-format/mus-stream-go"
 	slops "github.com/mus-format/mus-stream-go/options/slice"
 	"github.com/mus-format/mus-stream-go/varint"
 )
 
 // NewSliceSer returns a new slice serializer with the given element serializer.
-func NewSliceProtobuf[T any](elemProtobuf muss.Serializer[T]) sliceProtobuf[T] {
+func NewSliceProtobuf[T any](elemProtobuf mus.Serializer[T]) sliceProtobuf[T] {
 	return sliceProtobuf[T]{elemProtobuf}
 }
 
 // NewValidSliceSer returns a new valid slice serializer.
-func NewValidSliceProtobuf[T any](elemProtobuf muss.Serializer[T],
-	ops ...slops.SetOption[T]) validSliceProtobuf[T] {
+func NewValidSliceProtobuf[T any](elemProtobuf mus.Serializer[T],
+	ops ...slops.SetOption[T],
+) validSliceProtobuf[T] {
 	o := slops.Options[T]{}
 	slops.Apply(ops, &o)
 
@@ -37,10 +38,10 @@ func NewValidSliceProtobuf[T any](elemProtobuf muss.Serializer[T],
 
 // sliceProtobuf implements the mus.Serializer interface for slices.
 type sliceProtobuf[T any] struct {
-	elemProtobuf muss.Serializer[T]
+	elemProtobuf mus.Serializer[T]
 }
 
-func (s sliceProtobuf[T]) Marshal(sl []T, w muss.Writer) (n int, err error) {
+func (s sliceProtobuf[T]) Marshal(sl []T, w mus.Writer) (n int, err error) {
 	var (
 		n1     int
 		length = len(sl)
@@ -62,7 +63,7 @@ func (s sliceProtobuf[T]) Marshal(sl []T, w muss.Writer) (n int, err error) {
 	return
 }
 
-func (s sliceProtobuf[T]) Unmarshal(r muss.Reader) (sl []T, n int, err error) {
+func (s sliceProtobuf[T]) Unmarshal(r mus.Reader) (sl []T, n int, err error) {
 	var (
 		n1 int
 		e  T
@@ -88,7 +89,7 @@ func (s sliceProtobuf[T]) Size(sl []T) (size int) {
 	return size + varint.PositiveInt.Size(size)
 }
 
-func (s sliceProtobuf[T]) Skip(r muss.Reader) (n int, err error) {
+func (s sliceProtobuf[T]) Skip(r mus.Reader) (n int, err error) {
 	l, n, err := varint.PositiveInt.Unmarshal(r)
 	if err != nil {
 		return
@@ -112,7 +113,7 @@ type validSliceProtobuf[T any] struct {
 	elemVl com.Validator[T]
 }
 
-func (s validSliceProtobuf[T]) Unmarshal(r muss.Reader) (sl []T, n int, err error) {
+func (s validSliceProtobuf[T]) Unmarshal(r mus.Reader) (sl []T, n int, err error) {
 	var (
 		n1 int
 		e  T

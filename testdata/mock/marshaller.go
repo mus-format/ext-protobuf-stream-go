@@ -1,12 +1,14 @@
 package mock
 
 import (
-	muss "github.com/mus-format/mus-stream-go"
+	"github.com/mus-format/mus-stream-go"
 	"github.com/ymz-ncnk/mok"
 )
 
-type MarshalProtobufFn func(w muss.Writer) (n int, err error)
-type SizeProtobufFn func() (size int)
+type (
+	MarshalProtobufFn func(w mus.Writer) (n int, err error)
+	SizeProtobufFn    func() (size int)
+)
 
 func NewMarshallerProtobuf() MarshallerProtobuf {
 	return MarshallerProtobuf{mok.New("MarshallerProtobuf")}
@@ -26,7 +28,7 @@ func (m MarshallerProtobuf) RegisterSizeProtobuf(fn SizeProtobufFn) MarshallerPr
 	return m
 }
 
-func (m MarshallerProtobuf) MarshalProtobuf(w muss.Writer) (n int, err error) {
+func (m MarshallerProtobuf) MarshalProtobuf(w mus.Writer) (n int, err error) {
 	result, err := m.Call("MarshalProtobuf", w)
 	if err != nil {
 		panic(err)

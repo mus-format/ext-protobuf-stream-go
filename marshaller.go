@@ -1,9 +1,9 @@
-package exts
+package ext
 
-import muss "github.com/mus-format/mus-stream-go"
+import "github.com/mus-format/mus-stream-go"
 
 // MarshallerProtobuf interface wraps MarhsalProtobuf and SizeProtobuf methods.
 type MarshallerProtobuf interface {
-	MarshalProtobuf(w muss.Writer) (n int, err error)
+	MarshalProtobuf(w mus.Writer) (n int, err error)
 	SizeProtobuf() (size int)
 }

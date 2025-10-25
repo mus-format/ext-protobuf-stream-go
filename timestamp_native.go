@@ -1,15 +1,13 @@
-package exts
+package ext
 
 import (
-	muss "github.com/mus-format/mus-stream-go"
+	"github.com/mus-format/mus-stream-go"
 	"github.com/mus-format/mus-stream-go/varint"
 	"google.golang.org/protobuf/encoding/protowire"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-var (
-	TimestampNativeProtobuf = timestampNativeProtobuf{}
-)
+var TimestampNativeProtobuf = timestampNativeProtobuf{}
 
 var (
 	secondsFieldTag = protowire.EncodeTag(1, protowire.VarintType)
@@ -21,7 +19,8 @@ var (
 type timestampNativeProtobuf struct{}
 
 func (s timestampNativeProtobuf) Marshal(tm *timestamppb.Timestamp,
-	w muss.Writer) (n int, err error) {
+	w mus.Writer,
+) (n int, err error) {
 	var (
 		n1   int
 		size = s.size(tm)
@@ -60,8 +59,9 @@ func (s timestampNativeProtobuf) Marshal(tm *timestamppb.Timestamp,
 	return
 }
 
-func (timestampNativeProtobuf) Unmarshal(r muss.Reader) (
-	tm *timestamppb.Timestamp, n int, err error) {
+func (timestampNativeProtobuf) Unmarshal(r mus.Reader) (
+	tm *timestamppb.Timestamp, n int, err error,
+) {
 	size, _, err := varint.PositiveInt.Unmarshal(r)
 	if err != nil {
 		return
@@ -96,7 +96,7 @@ func (s timestampNativeProtobuf) Size(tm *timestamppb.Timestamp) (size int) {
 	return size + varint.PositiveInt.Size(size)
 }
 
-func (s timestampNativeProtobuf) Skip(r muss.Reader) (n int, err error) {
+func (s timestampNativeProtobuf) Skip(r mus.Reader) (n int, err error) {
 	size, _, err := varint.PositiveInt.Unmarshal(r)
 	if err != nil {
 		return

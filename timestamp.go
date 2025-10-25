@@ -1,7 +1,7 @@
-package exts
+package ext
 
 import (
-	muss "github.com/mus-format/mus-stream-go"
+	"github.com/mus-format/mus-stream-go"
 	"github.com/mus-format/mus-stream-go/varint"
 )
 
@@ -14,7 +14,7 @@ var TimestampProtobuf = timestampProtobuf{}
 
 type timestampProtobuf struct{}
 
-func (s timestampProtobuf) Marshal(tm Timestamp, w muss.Writer) (n int, err error) {
+func (s timestampProtobuf) Marshal(tm Timestamp, w mus.Writer) (n int, err error) {
 	var (
 		n1   int
 		size = s.size(tm)
@@ -51,8 +51,9 @@ func (s timestampProtobuf) Marshal(tm Timestamp, w muss.Writer) (n int, err erro
 	return
 }
 
-func (s timestampProtobuf) Unmarshal(r muss.Reader) (tm Timestamp, n int,
-	err error) {
+func (s timestampProtobuf) Unmarshal(r mus.Reader) (tm Timestamp, n int,
+	err error,
+) {
 	size, n, err := varint.PositiveInt.Unmarshal(r)
 	if err != nil {
 		return
@@ -86,7 +87,7 @@ func (s timestampProtobuf) Size(tm Timestamp) (size int) {
 	return size + varint.PositiveInt.Size(size)
 }
 
-func (s timestampProtobuf) Skip(r muss.Reader) (n int, err error) {
+func (s timestampProtobuf) Skip(r mus.Reader) (n int, err error) {
 	size, n, err := varint.PositiveInt.Unmarshal(r)
 	if err != nil {
 		return
