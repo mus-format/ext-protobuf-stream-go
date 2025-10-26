@@ -3,8 +3,8 @@ module github.com/mus-format/ext-protobuf-stream-go
 go 1.23.0
 
 require (
-	github.com/mus-format/common-go v0.0.0-20250307125743-867bbd6eb59c
-	github.com/mus-format/mus-stream-go v0.7.1
+	github.com/mus-format/common-go v0.0.0-20251026152644-9f5ac6728d8a
+	github.com/mus-format/mus-stream-go v0.7.2
 	google.golang.org/protobuf v1.36.6
 )
 
