@@ -8,12 +8,12 @@ import (
 )
 
 // NewSliceSer returns a new slice serializer with the given element serializer.
-func NewSliceProtobuf[T any](elemProtobuf mus.Serializer[T]) sliceProtobuf[T] {
-	return sliceProtobuf[T]{elemProtobuf}
+func NewSliceSer[T any](elemSer mus.Serializer[T]) sliceSer[T] {
+	return sliceSer[T]{elemSer}
 }
 
 // NewValidSliceSer returns a new valid slice serializer.
-func NewValidSliceProtobuf[T any](elemProtobuf mus.Serializer[T],
+func NewValidSliceSer[T any](elemSer mus.Serializer[T],
 	ops ...slops.SetOption[T],
 ) validSliceProtobuf[T] {
 	o := slops.Options[T]{}
@@ -30,18 +30,18 @@ func NewValidSliceProtobuf[T any](elemProtobuf mus.Serializer[T],
 		elemVl = o.ElemVl
 	}
 	return validSliceProtobuf[T]{
-		sliceProtobuf: NewSliceProtobuf(elemProtobuf),
-		lenVl:         lenVl,
-		elemVl:        elemVl,
+		sliceSer: NewSliceSer(elemSer),
+		lenVl:    lenVl,
+		elemVl:   elemVl,
 	}
 }
 
-// sliceProtobuf implements the mus.Serializer interface for slices.
-type sliceProtobuf[T any] struct {
+// sliceSer implements the mus.Serializer interface for slices.
+type sliceSer[T any] struct {
 	elemProtobuf mus.Serializer[T]
 }
 
-func (s sliceProtobuf[T]) Marshal(sl []T, w mus.Writer) (n int, err error) {
+func (s sliceSer[T]) Marshal(sl []T, w mus.Writer) (n int, err error) {
 	var (
 		n1     int
 		length = len(sl)
@@ -52,7 +52,7 @@ func (s sliceProtobuf[T]) Marshal(sl []T, w mus.Writer) (n int, err error) {
 		if err != nil {
 			return
 		}
-		for i := 0; i < len(sl); i++ {
+		for i := range len(sl) {
 			n1, err = s.elemProtobuf.Marshal(sl[i], w)
 			n += n1
 			if err != nil {
@@ -63,7 +63,7 @@ func (s sliceProtobuf[T]) Marshal(sl []T, w mus.Writer) (n int, err error) {
 	return
 }
 
-func (s sliceProtobuf[T]) Unmarshal(r mus.Reader) (sl []T, n int, err error) {
+func (s sliceSer[T]) Unmarshal(r mus.Reader) (sl []T, n int, err error) {
 	var (
 		n1 int
 		e  T
@@ -84,12 +84,12 @@ func (s sliceProtobuf[T]) Unmarshal(r mus.Reader) (sl []T, n int, err error) {
 	return
 }
 
-func (s sliceProtobuf[T]) Size(sl []T) (size int) {
+func (s sliceSer[T]) Size(sl []T) (size int) {
 	size = s.size(sl)
 	return size + varint.PositiveInt.Size(size)
 }
 
-func (s sliceProtobuf[T]) Skip(r mus.Reader) (n int, err error) {
+func (s sliceSer[T]) Skip(r mus.Reader) (n int, err error) {
 	l, n, err := varint.PositiveInt.Unmarshal(r)
 	if err != nil {
 		return
@@ -98,7 +98,7 @@ func (s sliceProtobuf[T]) Skip(r mus.Reader) (n int, err error) {
 	return
 }
 
-func (s sliceProtobuf[T]) size(sl []T) (size int) {
+func (s sliceSer[T]) size(sl []T) (size int) {
 	for i := range sl {
 		size += s.elemProtobuf.Size(sl[i])
 	}
@@ -108,12 +108,14 @@ func (s sliceProtobuf[T]) size(sl []T) (size int) {
 // -----------------------------------------------------------------------------
 
 type validSliceProtobuf[T any] struct {
-	sliceProtobuf[T]
+	sliceSer[T]
 	lenVl  com.Validator[int]
 	elemVl com.Validator[T]
 }
 
-func (s validSliceProtobuf[T]) Unmarshal(r mus.Reader) (sl []T, n int, err error) {
+func (s validSliceProtobuf[T]) Unmarshal(r mus.Reader) (sl []T, n int,
+	err error,
+) {
 	var (
 		n1 int
 		e  T

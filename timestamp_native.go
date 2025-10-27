@@ -7,18 +7,18 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-var TimestampNativeProtobuf = timestampNativeProtobuf{}
+var TimestampNativeSer = timestampNativeSer{}
 
 var (
 	secondsFieldTag = protowire.EncodeTag(1, protowire.VarintType)
 	nanosFieldTag   = protowire.EncodeTag(2, protowire.VarintType)
 )
 
-// timestampNativeProtobuf implements the mus.Serializer interface for
+// timestampNativeSer implements the mus.Serializer interface for
 // timestamppb.Timestamp.
-type timestampNativeProtobuf struct{}
+type timestampNativeSer struct{}
 
-func (s timestampNativeProtobuf) Marshal(tm *timestamppb.Timestamp,
+func (s timestampNativeSer) Marshal(tm *timestamppb.Timestamp,
 	w mus.Writer,
 ) (n int, err error) {
 	var (
@@ -59,7 +59,7 @@ func (s timestampNativeProtobuf) Marshal(tm *timestamppb.Timestamp,
 	return
 }
 
-func (timestampNativeProtobuf) Unmarshal(r mus.Reader) (
+func (timestampNativeSer) Unmarshal(r mus.Reader) (
 	tm *timestamppb.Timestamp, n int, err error,
 ) {
 	size, _, err := varint.PositiveInt.Unmarshal(r)
@@ -91,12 +91,12 @@ func (timestampNativeProtobuf) Unmarshal(r mus.Reader) (
 	return
 }
 
-func (s timestampNativeProtobuf) Size(tm *timestamppb.Timestamp) (size int) {
+func (s timestampNativeSer) Size(tm *timestamppb.Timestamp) (size int) {
 	size = s.size(tm)
 	return size + varint.PositiveInt.Size(size)
 }
 
-func (s timestampNativeProtobuf) Skip(r mus.Reader) (n int, err error) {
+func (s timestampNativeSer) Skip(r mus.Reader) (n int, err error) {
 	size, _, err := varint.PositiveInt.Unmarshal(r)
 	if err != nil {
 		return
@@ -125,7 +125,7 @@ func (s timestampNativeProtobuf) Skip(r mus.Reader) (n int, err error) {
 	return
 }
 
-func (s timestampNativeProtobuf) size(tm *timestamppb.Timestamp) (size int) {
+func (s timestampNativeSer) size(tm *timestamppb.Timestamp) (size int) {
 	if tm.Seconds != 0 {
 		size += varint.Uint64.Size(secondsFieldTag)
 		size += varint.PositiveInt64.Size(tm.Seconds)

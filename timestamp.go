@@ -10,11 +10,11 @@ type Timestamp struct {
 	Nanos   int32
 }
 
-var TimestampProtobuf = timestampProtobuf{}
+var TimestampSer = timestampSer{}
 
-type timestampProtobuf struct{}
+type timestampSer struct{}
 
-func (s timestampProtobuf) Marshal(tm Timestamp, w mus.Writer) (n int, err error) {
+func (s timestampSer) Marshal(tm Timestamp, w mus.Writer) (n int, err error) {
 	var (
 		n1   int
 		size = s.size(tm)
@@ -51,7 +51,7 @@ func (s timestampProtobuf) Marshal(tm Timestamp, w mus.Writer) (n int, err error
 	return
 }
 
-func (s timestampProtobuf) Unmarshal(r mus.Reader) (tm Timestamp, n int,
+func (s timestampSer) Unmarshal(r mus.Reader) (tm Timestamp, n int,
 	err error,
 ) {
 	size, n, err := varint.PositiveInt.Unmarshal(r)
@@ -82,12 +82,12 @@ func (s timestampProtobuf) Unmarshal(r mus.Reader) (tm Timestamp, n int,
 	return
 }
 
-func (s timestampProtobuf) Size(tm Timestamp) (size int) {
+func (s timestampSer) Size(tm Timestamp) (size int) {
 	size = s.size(tm)
 	return size + varint.PositiveInt.Size(size)
 }
 
-func (s timestampProtobuf) Skip(r mus.Reader) (n int, err error) {
+func (s timestampSer) Skip(r mus.Reader) (n int, err error) {
 	size, n, err := varint.PositiveInt.Unmarshal(r)
 	if err != nil {
 		return
@@ -116,7 +116,7 @@ func (s timestampProtobuf) Skip(r mus.Reader) (n int, err error) {
 	return
 }
 
-func (s timestampProtobuf) size(tm Timestamp) (size int) {
+func (s timestampSer) size(tm Timestamp) (size int) {
 	if tm.Seconds != 0 {
 		size += varint.Uint64.Size(secondsFieldTag)
 		size += varint.PositiveInt64.Size(tm.Seconds)
